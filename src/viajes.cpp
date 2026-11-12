@@ -4,7 +4,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-class Viaje{
+class Viaje
+{
     public:
         int id;
         int bici_id;
@@ -16,6 +17,60 @@ class Viaje{
 };
 
 //idea: cada esración cuenta con una lista de viajes.
+class ListaDeViajes
+{
+    private:
+        struct Nodo{
+
+            Viaje viaje;
+            Nodo * siguiente;
+            Nodo * anterior;
+        };
+    public:
+        Nodo * primero;
+        Nodo * ultimo;
+    
+    void push(Viaje viaje)
+    {
+        Nodo aux;
+        aux.viaje = viaje;
+        if(ultimo == nullptr)
+        {
+            aux.anterior = nullptr;
+            aux.siguiente = nullptr;
+            primero = &aux;
+            ultimo = &aux;
+        }
+        else
+        {
+            //comparar fechas para ver desde que lado iterar para asegurar orden por fecha.
+            int fechaPrimero = primero->viaje.fecha;
+            int fechaUltimo = ultimo->viaje.fecha;
+            if (viaje.fecha <= fechaPrimero)
+            {
+
+            }
+            else if (viaje.fecha >= fechaUltimo)
+            {
+
+            }
+            else {
+                int difPrimero = fechaPrimero - viaje.fecha;
+                int difUltimo = viaje.fecha - fechaUltimo;
+
+                if(difPrimero <= difUltimo)
+                {
+                    //iterar desde el inicio
+                }
+                else
+                {
+                    //iterar desde el final
+                }
+            }
+        }
+    }
+};
+
 
 void parser()
 {
