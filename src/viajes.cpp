@@ -16,59 +16,86 @@ class Viaje
         int durecion_min;
 };
 
-//idea: cada esración cuenta con una lista de viajes.
+//idea: cada estación cuenta con una lista de viajes. cada viaje se guarda de forma ordenada en una lista bidireccional
 class ListaDeViajes
 {
-    private:
-        struct Nodo{
-
-            Viaje viaje;
-            Nodo * siguiente;
-            Nodo * anterior;
-        };
-    public:
-        Nodo * primero;
-        Nodo * ultimo;
-    
-    void push(Viaje viaje)
+    struct Nodo
     {
-        Nodo aux;
-        aux.viaje = viaje;
-        if(ultimo == nullptr)
+        Viaje viaje;
+        Nodo * siguiente = nullptr;
+        Nodo * anterior = nullptr;
+    };
+    Nodo * primero = nullptr;
+    Nodo * ultimo = nullptr;
+
+    public:
+    bool vacia() const { return primero == nullptr;};
+    const Nodo * getPrimero() const { return primero;};
+    const Nodo * getultimo() const { return ultimo;};
+        
+    
+    void push(const Viaje& viaje)
+    {
+        Nodo* aux = new Nodo;
+        aux -> viaje = viaje;
+        if(vacia)
         {
-            aux.anterior = nullptr;
-            aux.siguiente = nullptr;
-            primero = &aux;
-            ultimo = &aux;
+            aux -> anterior = nullptr;
+            aux -> siguiente = nullptr;
+            primero = aux;
+            ultimo = aux;
         }
         else
         {
-            //comparar fechas para ver desde que lado iterar para asegurar orden por fecha.
-            int fechaPrimero = primero->viaje.fecha;
-            int fechaUltimo = ultimo->viaje.fecha;
+            int fechaPrimero = primero -> viaje.fecha;
+            int fechaUltimo = ultimo -> viaje.fecha;
             if (viaje.fecha <= fechaPrimero)
             {
-
+                aux -> siguiente = primero;
+                primero -> anterior = aux;
+                primero = aux;
             }
             else if (viaje.fecha >= fechaUltimo)
             {
-
+                aux -> anterior = ultimo;
+                ultimo -> siguiente = aux;
+                ultimo = aux;
             }
+            //si la fecha es posterior a la del primero y anterior al del ultimo, compara para ver desde que lado iterar para asegurar orden por fecha.
             else {
-                int difPrimero = fechaPrimero - viaje.fecha;
-                int difUltimo = viaje.fecha - fechaUltimo;
+                int difPrimero = viaje.fecha - fechaPrimero;
+                int difUltimo = fechaUltimo - viaje.fecha;
+                Nodo * nodoActual;
 
                 if(difPrimero <= difUltimo)
                 {
-                    //iterar desde el inicio
+                    nodoActual = primero -> siguiente;
+                    while(nodoActual -> viaje.fecha <= viaje.fecha)
+                    {
+                        nodoActual = nodoActual -> siguiente;
+                    }
+                    nodoActual = nodoActual -> anterior;
+
                 }
                 else
                 {
-                    //iterar desde el final
+                    nodoActual = ultimo -> anterior;
+                    while(nodoActual -> viaje.fecha >= viaje.fecha)
+                    {
+                        nodoActual = nodoActual->anterior;
+                    }
                 }
+                aux -> siguiente = nodoActual -> siguiente;
+                aux -> anterior = nodoActual;
+                nodoActual -> siguiente = aux;
+                aux -> siguiente -> anterior = aux;
             }
         }
     }
+
+   ~ListaDeViajes() {
+    for (Nodo* n = primero; n; ) { Nodo* sig = n->siguiente; delete n; n = sig; }
+} 
 };
 
 
@@ -85,44 +112,31 @@ void parser()
     DatosDeViaje.close();
 };
 
-class Bicicleta{
-    private:
-        int id;
-        string tipo;
-        string estado;
-        int kilometros;
-    
-    int id(){return id;};
-    string estadoActual(){return estado;};
-    int kilometrosRecorridos(){return kilometros;};
-};
-
-
-
 class ColaDeUsuarios {
     private:
         struct Nodo
         {
             int dni;
-            Nodo* siguiente;
+            Nodo* siguiente = nullptr;
         };
 
-        Nodo* primero;
-        Nodo* ultimo;
+        Nodo* primero = nullptr;
+        Nodo* ultimo = nullptr;
 
     void Push(int dni)
     {
-        Nodo aux;
-        aux.dni = dni;
-        aux.siguiente = nullptr;
+        Nodo* aux = new Nodo;
+        aux -> dni = dni;
+        aux -> siguiente = nullptr;
 
         if (ultimo == nullptr)
         {
-            ultimo, primero = &aux;
+            ultimo = aux;
+            primero = ultimo;
         }
         else
         {
-        ultimo->siguiente = &aux;
+        ultimo -> siguiente = aux;
         }
     }
 
