@@ -16,29 +16,60 @@ class Viaje
         int durecion_min;
 };
 
+class Nodo
+{
+    friend class ListaDeViajes;
+
+    Viaje viaje;
+    Nodo * siguiente = nullptr;
+    Nodo * anterior = nullptr;
+
+    public:
+    const Nodo * getSiguiente() const { return siguiente;};
+    const Nodo * getAnterior() const { return anterior;};
+    const Viaje * getViaje() const { return &viaje;};
+
+    ~Nodo()
+    {
+        if(anterior != nullptr && siguiente != nullptr)
+        {
+            anterior -> siguiente = siguiente;
+            siguiente -> anterior = anterior;
+        }
+        else if(anterior != nullptr && siguiente == nullptr)
+        {
+            anterior -> siguiente = nullptr;
+        }
+        else if(siguiente != nullptr && anterior == nullptr)
+        {
+            siguiente -> anterior == nullptr;
+        }
+
+        delete siguiente;
+        delete anterior;
+        //delete viaje; <- averiguar como hacer
+    }
+};
+
 //idea: cada estación cuenta con una lista de viajes. cada viaje se guarda de forma ordenada en una lista bidireccional
 class ListaDeViajes
 {
-    struct Nodo
-    {
-        Viaje viaje;
-        Nodo * siguiente = nullptr;
-        Nodo * anterior = nullptr;
-    };
+    friend class Nodo;
+
     Nodo * primero = nullptr;
     Nodo * ultimo = nullptr;
 
     public:
     bool vacia() const { return primero == nullptr;};
     const Nodo * getPrimero() const { return primero;};
-    const Nodo * getultimo() const { return ultimo;};
+    const Nodo * getUltimo() const { return ultimo;};
         
     
     void push(const Viaje& viaje)
     {
         Nodo* aux = new Nodo;
         aux -> viaje = viaje;
-        if(vacia)
+        if(vacia())
         {
             aux -> anterior = nullptr;
             aux -> siguiente = nullptr;
