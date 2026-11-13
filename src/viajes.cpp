@@ -13,10 +13,10 @@ class Viaje
         string estacion_origen;
         string estacion_destino;
         int fecha;
-        int durecion_min;
+        int duracion_min;
 };
 
-//idea: cada estación cuenta con una lista de viajes. cada viaje se guarda de forma ordenada en una lista bidireccional
+//Lista Ordenada doblemente enlazada para permitir busquedas e inserciones ordenadas desde cualquier extremo. Complejidad O(N) de busqueda y O(log N) de inserción ya que elige el extremo con menor diferencia respecto a la fecha del viaje a insertar.
 class ListaDeViajes
 {
     struct Nodo {
@@ -97,6 +97,62 @@ class ListaDeViajes
     for (Nodo* n = primero; n; ) { Nodo* sig = n->siguiente; delete n; n = sig; }
 } 
 };
+
+int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha2, string estacion){
+    const auto* primero = lista->getPrimero();
+    const auto* ultimo = lista->getUltimo();
+    int cantidadDeViajes=0;
+
+    if (fecha2 > fecha1) swap(fecha1,fecha2);
+
+    if (!lista->vacia())
+    {
+        int diferenciaInicio = fecha1 - primero->viaje.fecha;
+        int diferenciaFinal = ultimo->viaje.fecha - fecha2;
+
+        auto* nodoActual = primero;
+        if(diferenciaInicio<=diferenciaFinal)
+        {
+            while(nodoActual != nullptr && nodoActual->viaje.fecha <= fecha2)
+            {
+                if(nodoActual->viaje.estacion_origen == estacion && nodoActual->viaje.fecha >= fecha1)
+                {
+                    cantidadDeViajes += 1;
+                }
+                nodoActual = nodoActual->siguiente;
+            }
+        }
+        else
+        {
+            nodoActual = ultimo;
+            while(nodoActual!= nullptr && nodoActual->viaje.fecha >= fecha1)
+            {
+                if(nodoActual->viaje.estacion_origen == estacion && nodoActual->viaje.fecha <= fecha2)
+                {
+                    cantidadDeViajes += 1;
+                }
+                nodoActual = nodoActual->anterior;
+            }
+        }
+    }
+
+    return cantidadDeViajes;
+}
+
+int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario)
+{
+    int minutosPedaleados = 0;
+    auto* nodoActual = lista->getPrimero();
+
+    while (nodoActual != nullptr)
+    {
+        minutosPedaleados += nodoActual->viaje.duracion_min;
+        nodoActual = nodoActual->siguiente;
+    }
+
+
+    return minutosPedaleados;
+}
 
 
 void parser()
