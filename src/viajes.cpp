@@ -1,18 +1,18 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-class Viaje
+struct Viaje
 {
-    public:
-        int id;
-        int bici_id;
-        int dni_usuario;
-        string estacion_origen;
-        string estacion_destino;
-        int fecha;
-        int duracion_min;
+    int id;
+    int bici_id;
+    int dni_usuario;
+    string estacion_origen;
+    string estacion_destino;
+    int fecha;
+    int duracion_min;
 };
 
 //Lista Ordenada doblemente enlazada para permitir busquedas e inserciones ordenadas desde cualquier extremo. Complejidad O(N) de busqueda y O(log N) de inserción ya que elige el extremo con menor diferencia respecto a la fecha del viaje a insertar.
@@ -154,15 +154,26 @@ int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario)
 }
 
 
-void parser()
+void llenarConDatos(ListaDeViajes* lista)
 {
-    string linea = "";
+    string linea = "", estacion_origen = "", estacion_destino = "";
+    int viaje_id = 0, bici_id = 0, dni_usuario = 0, fecha = 0, duracion_min = 0;
     fstream DatosDeViaje;
     DatosDeViaje.open("./src/datos de entrada/viajes.txt");
-    getline(DatosDeViaje,linea);
 
-    stringstream ss(linea);
+    while (DatosDeViaje >> viaje_id >> bici_id >> dni_usuario >> estacion_origen >> estacion_destino >> fecha >> duracion_min)
+    {
+        Viaje* aux = new Viaje();
+        aux->id = viaje_id;
+        aux->bici_id = bici_id;
+        aux->dni_usuario = dni_usuario;
+        aux->estacion_origen = estacion_origen;
+        aux->estacion_destino = estacion_destino;
+        aux->fecha = fecha;
+        aux->duracion_min = duracion_min;
 
+        lista->push(*aux);
+    }
 
     DatosDeViaje.close();
 };
