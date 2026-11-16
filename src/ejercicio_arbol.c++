@@ -4,18 +4,44 @@
 
 using namespace std;
 
-struct NodoBici {
+class Bicicleta {
+private:
     int biciId;
     string codigoEstacion;
     string tipo;
     string estado;
     int kilometros;
+
+public:
+    Bicicleta(int id, string est, string t, string e, int km)
+        : biciId(id), codigoEstacion(est), tipo(t), estado(e), kilometros(km) {}
+
+    int getBiciId() const { return biciId; }
+    string getCodigoEstacion() const { return codigoEstacion; }
+    string getTipo() const { return tipo; }
+    string getEstado() const { return estado; }
+    int getKilometros() const { return kilometros; }
+
+    void setCodigoEstacion(const string& est) { codigoEstacion = est; }
+    void setEstado(const string& nuevoEstado) { estado = nuevoEstado; }
+    void setKilometros(int km) { kilometros = km; }
+
+    void mostrarDatos() const {
+        cout << "Id: " << biciId 
+             << " | Estacion: " << codigoEstacion 
+             << " | Tipo: " << tipo 
+             << " | Estado: " << estado 
+             << " | Km: " << kilometros << endl;
+    }
+};
+
+struct NodoBici {
+    Bicicleta bici;
     NodoBici* hijoIzquierda;
     NodoBici* hijoDerecha;
 
     NodoBici(int id, string est, string t, string e, int km)
-        : biciId(id), codigoEstacion(est), tipo(t), estado(e), kilometros(km),
-          hijoIzquierda(nullptr), hijoDerecha(nullptr) {}
+        : bici(id, est, t, e, km), hijoIzquierda(nullptr), hijoDerecha(nullptr) {}
 };
 
 class ArbolBicicletas {
@@ -26,19 +52,19 @@ private:
         if (actual == nullptr) {
             return new NodoBici(id, est, t, e, km);
         }
-        if (id < actual->biciId) {
+        if (id < actual->bici.getBiciId()) {
             actual->hijoIzquierda = insertarRecursivo(actual->hijoIzquierda, id, est, t, e, km);
-        } else if (id > actual->biciId) {
+        } else if (id > actual->bici.getBiciId()) {
             actual->hijoDerecha = insertarRecursivo(actual->hijoDerecha, id, est, t, e, km);
         }
         return actual;
     }
 
     NodoBici* buscarRecursivo(NodoBici* actual, int id) const {
-        if (actual == nullptr || actual->biciId == id) {
+        if (actual == nullptr || actual->bici.getBiciId() == id) {
             return actual;
         }
-        if (id < actual->biciId) {
+        if (id < actual->bici.getBiciId()) {
             return buscarRecursivo(actual->hijoIzquierda, id);
         }
         return buscarRecursivo(actual->hijoDerecha, id);
@@ -47,18 +73,15 @@ private:
     void inordenRecursivo(NodoBici* actual) const {
         if (actual != nullptr) {
             inordenRecursivo(actual->hijoIzquierda);
-            cout << "  ID: " << actual->biciId 
-                 << "  Estacion: " << actual->codigoEstacion 
-                 << "  Tipo: " << actual->tipo 
-                 << "  Estado: " << actual->estado 
-                 << "  Km: " << actual->kilometros << endl;
+            cout << "  ";
+            actual->bici.mostrarDatos();
             inordenRecursivo(actual->hijoDerecha);
         }
     }
 
     int contarAveriadasRecursivo(NodoBici* actual) const {
         if (actual == nullptr) return 0;
-        int contadorLocal = (actual->estado == "Averiada") ? 1 : 0;
+        int contadorLocal = (actual->bici.getEstado() == "Averiada") ? 1 : 0;
         return contadorLocal + contarAveriadasRecursivo(actual->hijoIzquierda) 
                + contarAveriadasRecursivo(actual->hijoDerecha);
     }
@@ -87,9 +110,9 @@ private:
     NodoBici* eliminarRecursivo(NodoBici* actual, int id) {
         if (actual == nullptr) return nullptr;
 
-        if (id < actual->biciId) {
+        if (id < actual->bici.getBiciId()) {
             actual->hijoIzquierda = eliminarRecursivo(actual->hijoIzquierda, id);
-        } else if (id > actual->biciId) {
+        } else if (id > actual->bici.getBiciId()) {
             actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, id);
         } else {
             if (actual->hijoIzquierda == nullptr && actual->hijoDerecha == nullptr) {
@@ -107,12 +130,10 @@ private:
                 return temp;
             }
             NodoBici* temp = obtenerMinimo(actual->hijoDerecha);
-            actual->biciId = temp->biciId;
-            actual->codigoEstacion = temp->codigoEstacion;
-            actual->tipo = temp->tipo;
-            actual->estado = temp->estado;
-            actual->kilometros = temp->kilometros;
-            actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, temp->biciId);
+            actual = new (actual) NodoBici(temp->bici.getBiciId(), temp->bici.getCodigoEstacion(), 
+                                           temp->bici.getTipo(), temp->bici.getEstado(), 
+                                           temp->bici.getKilometros());
+            actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, temp->bici.getBiciId());
         }
         return actual;
     }
@@ -125,6 +146,10 @@ public:
         raiz = nullptr;
     }
 
+    NodoBici* obtenerRaiz() const {
+        return raiz;
+    }
+
     void insertar(int id, string est, string t, string e, int km) {
         raiz = insertarRecursivo(raiz, id, est, t, e, km);
     }
@@ -132,19 +157,16 @@ public:
     bool buscarPorId(int id) const {
         NodoBici* buscado = buscarRecursivo(raiz, id);
         if (buscado != nullptr) {
-            cout << "Bicicleta Encontrada -> ID: " << buscado->biciId 
-                 << " | Estacion: " << buscado->codigoEstacion 
-                 << " | Tipo: " << buscado->tipo 
-                 << " | Estado: " << buscado->estado 
-                 << " | Km: " << buscado->kilometros << endl;
+            cout << "Bicicleta> ";
+            buscado->bici.mostrarDatos();
             return true;
         }
-        cout << "Bicicleta con ID " << id << " no encontrada en el sistema." << endl;
+        cout << "Bicicleta con id " << id << " no encontrada en el sistema." << endl;
         return false;
     }
 
     void listarInorden() const {
-        cout << "--- Lista de bicicletas ---\n";
+        cout << " Lista de bicicletas \n";
         inordenRecursivo(raiz);
     }
 
