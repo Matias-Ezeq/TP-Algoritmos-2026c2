@@ -23,15 +23,17 @@ class ListaEnlazada
     
         void push(T * dato)
         {
+           Nodo* nuevoNodo = new Nodo(dato);
             if (primero == nullptr)
             {
-                primero = dato;
+                primero = nuevoNodo;
                 ultimo = primero;
             }
             else
             {
-                ultimo->siguiente = dato;
-                ultimo = dato;
+                ultimo->siguiente = nuevoNodo;
+                nuevoNodo->anterior = ultimo;
+                ultimo = nuevoNodo;
             }
         }
 
