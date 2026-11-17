@@ -36,12 +36,12 @@ public:
 };
 
 struct NodoBici {
-    Bicicleta bici;
+    Bicicleta* bici;
     NodoBici* hijoIzquierda;
     NodoBici* hijoDerecha;
 
     NodoBici(int id, string est, string t, string e, int km)
-        : bici(id, est, t, e, km), hijoIzquierda(nullptr), hijoDerecha(nullptr) {}
+        : bici(new Bicicleta(id,est,t,e,km)), hijoIzquierda(nullptr), hijoDerecha(nullptr) {}
 };
 
 class ArbolBicicletas {
@@ -52,19 +52,19 @@ private:
         if (actual == nullptr) {
             return new NodoBici(id, est, t, e, km);
         }
-        if (id < actual->bici.getBiciId()) {
+        if (id < actual->bici->getBiciId()) {
             actual->hijoIzquierda = insertarRecursivo(actual->hijoIzquierda, id, est, t, e, km);
-        } else if (id > actual->bici.getBiciId()) {
+        } else if (id > actual->bici->getBiciId()) {
             actual->hijoDerecha = insertarRecursivo(actual->hijoDerecha, id, est, t, e, km);
         }
         return actual;
     }
 
     NodoBici* buscarRecursivo(NodoBici* actual, int id) const {
-        if (actual == nullptr || actual->bici.getBiciId() == id) {
+        if (actual == nullptr || actual->bici->getBiciId() == id) {
             return actual;
         }
-        if (id < actual->bici.getBiciId()) {
+        if (id < actual->bici->getBiciId()) {
             return buscarRecursivo(actual->hijoIzquierda, id);
         }
         return buscarRecursivo(actual->hijoDerecha, id);
@@ -74,14 +74,14 @@ private:
         if (actual != nullptr) {
             inordenRecursivo(actual->hijoIzquierda);
             cout << "  ";
-            actual->bici.mostrarDatos();
+            actual->bici->mostrarDatos();
             inordenRecursivo(actual->hijoDerecha);
         }
     }
 
     int contarAveriadasRecursivo(NodoBici* actual) const {
         if (actual == nullptr) return 0;
-        int contadorLocal = (actual->bici.getEstado() == "Averiada") ? 1 : 0;
+        int contadorLocal = (actual->bici->getEstado() == "Averiada") ? 1 : 0;
         return contadorLocal + contarAveriadasRecursivo(actual->hijoIzquierda) 
                + contarAveriadasRecursivo(actual->hijoDerecha);
     }
