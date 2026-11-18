@@ -34,3 +34,17 @@ Si las bicicletas se insertan en el árbol en un orden estrictamente secuencial 
 * **En un árbol degenerado (lineal):** La complejidad temporal empeora drásticamente y pasa a ser lineal, expresada como $O(n)$.
 
 Para buscar el último elemento (ID 50), el sistema se verá obligado a recorrer uno por uno todos los nodos anteriores, perdiendo por completo la ventaja de eficiencia que caracteriza a los árboles de búsqueda.
+
+### Punto B: viajes y colas de espera
+
+#### Lista de viajes
+
+* Implementada como lista ordenada doble enlazada, con complejidad O(n) para insertar y O(log n) para búsqueda. Al ser doblemente enlazada permite la busqueda e inserción de elementos desde ambos extremos, lo cual reduce el tiempo de busqueda a la mitad al empezar el recorrido desde el extremo con menor diferencia a la fecha buscada.
+
+#### Cola de espera
+
+* implementada como queue con una lista enlazada, con complejidad O(1) tanto para encolar como desencolar. Los elementos se agregan al final y se extraen desde el principio.
+
+#### Cola de prioridad
+
+* implementada con una lista doblemente enlazada, con complejidad O(n) para encolar y O(1) para extraer. En caso de encolar un elemento con mayor prioridad que el primero o menor/igual prioridad que el último, se inserta en O(1).
