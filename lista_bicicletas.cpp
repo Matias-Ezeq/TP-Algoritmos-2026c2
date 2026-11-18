@@ -20,6 +20,22 @@ class ListaEnlazada
         Nodo * getPrimero(){
             return primero;
         }
+
+        ~ListaEnlazada()
+        {
+            // Solo se liberan los nodos: los Bicicleta* pertenecen al arbol.
+            Nodo* actual = primero;
+
+            while (actual != nullptr)
+            {
+                Nodo* siguiente = actual->siguiente;
+                delete actual;
+                actual = siguiente;
+            }
+
+            primero = nullptr;
+            ultimo = nullptr;
+        }
     
         void push(T * dato)
         {
