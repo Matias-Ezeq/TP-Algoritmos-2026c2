@@ -4,6 +4,19 @@ Ejecutar desde el directorio raiz con el siguiente comando:
 
 ./out/(nombreDelPrograma)
 
+### Tabla hash de estaciones
+
+Las estaciones se cargan en una tabla hash de 43 posiciones, indexadas por el codigo de estacion. Se utiliza encadenamiento para resolver las colisiones: las estaciones que producen el mismo indice quedan en una lista enlazada en esa posicion.
+
+Con los datos de prueba:
+
+- Estaciones cargadas: 33
+- Capacidad de la tabla: 43 posiciones
+- Colisiones: 9
+- Factor de carga: 33 / 43 = 0.767442
+
+Se eligió 43 para que el factor de carga quede por debajo del 0.8 que se mencionaba en los apuntes (factor de carga = cantidad de estaciones / cantidad de posiciones).
+
 ### Análisis de Carga de Datos Ordenados en el ABB
 
 #### Pregunta: 
