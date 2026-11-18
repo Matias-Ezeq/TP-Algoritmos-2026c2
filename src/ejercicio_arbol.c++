@@ -110,9 +110,9 @@ private:
     NodoBici* eliminarRecursivo(NodoBici* actual, int id) {
         if (actual == nullptr) return nullptr;
 
-        if (id < actual->bici.getBiciId()) {
+        if (id < actual->bici->getBiciId()) {
             actual->hijoIzquierda = eliminarRecursivo(actual->hijoIzquierda, id);
-        } else if (id > actual->bici.getBiciId()) {
+        } else if (id > actual->bici->getBiciId()) {
             actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, id);
         } else {
             if (actual->hijoIzquierda == nullptr && actual->hijoDerecha == nullptr) {
@@ -130,10 +130,10 @@ private:
                 return temp;
             }
             NodoBici* temp = obtenerMinimo(actual->hijoDerecha);
-            actual = new (actual) NodoBici(temp->bici.getBiciId(), temp->bici.getCodigoEstacion(), 
-                                           temp->bici.getTipo(), temp->bici.getEstado(), 
-                                           temp->bici.getKilometros());
-            actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, temp->bici.getBiciId());
+            actual = new (actual) NodoBici(temp->bici->getBiciId(), temp->bici->getCodigoEstacion(), 
+                                           temp->bici->getTipo(), temp->bici->getEstado(), 
+                                           temp->bici->getKilometros());
+            actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, temp->bici->getBiciId());
         }
         return actual;
     }
@@ -158,7 +158,7 @@ public:
         NodoBici* buscado = buscarRecursivo(raiz, id);
         if (buscado != nullptr) {
             cout << "Bicicleta> ";
-            buscado->bici.mostrarDatos();
+            buscado->bici->mostrarDatos();
             return true;
         }
         cout << "Bicicleta con id " << id << " no encontrada en el sistema." << endl;
