@@ -127,4 +127,15 @@ public:
     }
 };
 
+void llenarConDatos(ListaDeViajes* lista);
+
+int cantidadDeViajesEntreFechaYFecha(
+    ListaDeViajes* lista,
+    int fecha1,
+    int fecha2,
+    const std::string& estacion
+);
+
+int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario);
+
 #endif

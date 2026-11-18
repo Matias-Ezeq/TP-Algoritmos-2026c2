@@ -175,7 +175,6 @@ void guardarSolucion(
 
     while (nodo != nullptr)
     {
-        // Copia profunda: la solucion no puede compartir los strings del camino
         solucion->push(new string(*(nodo->dato)));
         nodo = nodo->siguiente;
     }
@@ -192,20 +191,17 @@ void buscarSubconjuntosRecursivo(
     ListaDobleEnlazada<ListaDobleEnlazada<string>>& soluciones
 )
 {
-    // Solucion: el subconjunto suma exactamente la capacidad del camion
     if (restante == 0)
     {
         guardarSolucion(camino, soluciones);
         return;
     }
 
-    // Poda: se terminaron las estaciones o ya me pase del limite
     if (nodo == nullptr || restante < 0)
     {
         return;
     }
 
-    // Rama 1: incluir esta estacion
     if (nodo->dato->dato2 <= restante)
     {
         camino.push(new string(nodo->dato->dato1));
@@ -220,7 +216,6 @@ void buscarSubconjuntosRecursivo(
         delete camino.pop();
     }
 
-    // Rama 2: no incluir esta estacion
     buscarSubconjuntosRecursivo(
         nodo->siguiente,
         restante,
@@ -238,8 +233,6 @@ ListaDobleEnlazada<ListaDobleEnlazada<string>> * redistribuir(
     ListaDobleEnlazada<Tupla<string,int>> candidatas;
     auto* nodoActual = estaciones.getPrimero();
 
-    // Descarta las estaciones cuyo faltante solo ya supera al camion.
-    // Tambien descarta faltantes nulos, que generarian soluciones repetidas.
     while (nodoActual != nullptr)
     {
         if (nodoActual->dato->dato2 > 0
