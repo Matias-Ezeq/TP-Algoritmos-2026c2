@@ -145,7 +145,11 @@ int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario)
 
     while (nodoActual != nullptr)
     {
-        minutosPedaleados += nodoActual->viaje.duracion_min;
+        if (nodoActual->viaje.dni_usuario == dniUsuario)
+        {
+            minutosPedaleados += nodoActual->viaje.duracion_min;
+        }
+
         nodoActual = nodoActual->siguiente;
     }
 
@@ -163,16 +167,16 @@ void llenarConDatos(ListaDeViajes* lista)
 
     while (DatosDeViaje >> viaje_id >> bici_id >> dni_usuario >> estacion_origen >> estacion_destino >> fecha >> duracion_min)
     {
-        Viaje* aux = new Viaje();
-        aux->id = viaje_id;
-        aux->bici_id = bici_id;
-        aux->dni_usuario = dni_usuario;
-        aux->estacion_origen = estacion_origen;
-        aux->estacion_destino = estacion_destino;
-        aux->fecha = fecha;
-        aux->duracion_min = duracion_min;
+        Viaje aux;
+        aux.id = viaje_id;
+        aux.bici_id = bici_id;
+        aux.dni_usuario = dni_usuario;
+        aux.estacion_origen = estacion_origen;
+        aux.estacion_destino = estacion_destino;
+        aux.fecha = fecha;
+        aux.duracion_min = duracion_min;
 
-        lista->push(*aux);
+        lista->push(aux);
     }
 
     DatosDeViaje.close();
@@ -189,38 +193,70 @@ class ColaDeUsuarios {
         Nodo* primero = nullptr;
         Nodo* ultimo = nullptr;
 
-    void Push(int dni)
-    {
-        Nodo* aux = new Nodo;
-        aux -> dni = dni;
-        aux -> siguiente = nullptr;
-
-        if (ultimo == nullptr)
+    public:
+        ~ColaDeUsuarios()
         {
-            ultimo = aux;
-            primero = ultimo;
-        }
-        else
-        {
-        ultimo -> siguiente = aux;
-        }
-    }
+            while (primero != nullptr)
+            {
+                Nodo* aux = primero;
+                primero = primero->siguiente;
+                delete aux;
+            }
 
-    int Pop()
-    {
-        Nodo* aux = primero;
-        primero = primero->siguiente;
-        int dni = aux->dni;
-        aux->siguiente = nullptr;
-        delete aux;
-        return dni;
-    }    
+            ultimo = nullptr;
+        }
+
+        bool vacia() const
+        {
+            return primero == nullptr;
+        }
+
+        void Push(int dni)
+        {
+            Nodo* aux = new Nodo;
+            aux -> dni = dni;
+            aux -> siguiente = nullptr;
+
+            if (ultimo == nullptr)
+            {
+                primero = aux;
+                ultimo = aux;
+            }
+            else
+            {
+                ultimo -> siguiente = aux;
+                ultimo = aux;
+            }
+        }
+
+        int Pop()
+        {
+            // Devuelve -1 si la cola esta vacia; conviene consultar vacia() antes.
+            if (primero == nullptr)
+            {
+                return -1;
+            }
+
+            Nodo* aux = primero;
+            primero = primero->siguiente;
+            int dni = aux->dni;
+            aux->siguiente = nullptr;
+            delete aux;
+
+            if (primero == nullptr)
+            {
+                ultimo = nullptr;
+            }
+
+            return dni;
+        }
 };
 
 
 int main()
 {
-    parser();
+    ListaDeViajes lista;
+    llenarConDatos(&lista);
 
     return 0;
 }
