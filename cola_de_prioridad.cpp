@@ -102,11 +102,25 @@ class ColaDePrioridad
     
     public:
 
+        ~ColaDePrioridad()
+        {
+            // Los nodos son propios de la cola. Las Bicicleta* no se liberan
+            // aca porque extraer() las devuelve y las libera su dueño.
+            while (primero != nullptr)
+            {
+                Nodo* aux = primero;
+                primero = aux->siguiente;
+                delete aux;
+            }
+
+            ultimo = nullptr;
+        }
+
         void insertar(Bicicleta * bicicleta)
         {
             Nodo * aux = new Nodo(bicicleta);
 
-            if (primero = nullptr)
+            if (primero == nullptr)
             {
                 primero = aux;
                 ultimo = aux;
