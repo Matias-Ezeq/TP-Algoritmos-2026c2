@@ -2,18 +2,12 @@
 #include <string>
 #include <fstream>
 #include <bits/stdc++.h>
+
+#include "modelos.h"
+
 using namespace std;
 
-struct Viaje
-{
-    int id;
-    int bici_id;
-    int dni_usuario;
-    string estacion_origen;
-    string estacion_destino;
-    int fecha;
-    int duracion_min;
-};
+
 
 //Lista Ordenada doblemente enlazada para permitir busquedas e inserciones ordenadas desde cualquier extremo. Complejidad O(N) de busqueda y O(log N) de inserción ya que elige el extremo con menor diferencia respecto a la fecha del viaje a insertar.
 class ListaDeViajes

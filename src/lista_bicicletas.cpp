@@ -1,5 +1,7 @@
-#include <ejercicio_arbol.c++>
+#include "ejercicio_arbol.c++"
+#include "modelos.h"
 #include "estructuras.h"
+
 using namespace std;
 
 void recorrerArbolRecursivo(NodoBici * nodoActual, ListaEnlazada<Bicicleta> * bicicletas,int kilometraje)
