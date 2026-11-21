@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+
+#include "estructuras.h"
 #include "estaciones.cpp"
 #include "ciclovias.cpp"
 
