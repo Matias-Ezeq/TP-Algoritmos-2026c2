@@ -4,7 +4,10 @@
 #include <bits/stdc++.h>
 
 #include "modelos.h"
+<<<<<<< HEAD
 #include "estructuras.h"
+=======
+>>>>>>> 71338bb (menu completo de los cuatro puntos (A, B, C y D))
 
 using namespace std;
 
@@ -90,7 +93,7 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
     const auto* ultimo = lista->getUltimo();
     int cantidadDeViajes=0;
 
-    if (fecha2 > fecha1) swap(fecha1,fecha2);
+    if (fecha1 > fecha2) swap(fecha1,fecha2);
 
     if (!lista->vacia())
     {

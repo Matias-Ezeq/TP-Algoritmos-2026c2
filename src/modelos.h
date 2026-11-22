@@ -5,6 +5,8 @@
 
 #define MODELOS_H
 
+using namespace std;
+
 class Bicicleta {
 private:
     int biciId;

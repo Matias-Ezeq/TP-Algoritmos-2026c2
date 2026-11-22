@@ -162,6 +162,79 @@ public:
         return true;
     }
 
+    bool eliminarEstacion(const string& codigo)
+    {
+        int indice = buscarVertice(codigo);
+
+        if (indice == -1)
+        {
+            return false;
+        }
+
+        int ultimo = cantidadVertices - 1;
+
+        // 1. Liberar las aristas del vertice que se elimina.
+        NodoVecino* vecino = vertices[indice].vecinos;
+
+        while (vecino != nullptr)
+        {
+            NodoVecino* siguiente = vecino->siguiente;
+            delete vecino;
+            vecino = siguiente;
+        }
+
+        vertices[indice].vecinos = nullptr;
+
+        // 2. Mover el ultimo vertice a la posicion libre.
+        if (indice != ultimo)
+        {
+            vertices[indice] = vertices[ultimo];
+            vertices[ultimo].vecinos = nullptr;
+            vertices[ultimo].codigo = "";
+        }
+
+        cantidadVertices--;
+
+        // 3. Quitar aristas hacia el vertice borrado y reindexar el ultimo.
+        for (int i = 0; i < cantidadVertices; i++)
+        {
+            NodoVecino* actual = vertices[i].vecinos;
+            NodoVecino* anterior = nullptr;
+
+            while (actual != nullptr)
+            {
+                NodoVecino* siguiente = actual->siguiente;
+
+                if (actual->vertice == indice)
+                {
+                    if (anterior == nullptr)
+                    {
+                        vertices[i].vecinos = siguiente;
+                    }
+                    else
+                    {
+                        anterior->siguiente = siguiente;
+                    }
+
+                    delete actual;
+                }
+                else
+                {
+                    if (actual->vertice == ultimo)
+                    {
+                        actual->vertice = indice;
+                    }
+
+                    anterior = actual;
+                }
+
+                actual = siguiente;
+            }
+        }
+
+        return true;
+    }
+
     bool agregarCiclovia(
         const string& codigoOrigen,
         const string& codigoDestino
@@ -231,11 +304,8 @@ public:
         {
             int actual = desencolar();
 
-            if (actual == destino)
-            {
-                break;
-            }
-
+            // No se corta al llegar al destino: hay que vaciar la cola para
+            // que la proxima busqueda empiece limpia.
             NodoVecino* vecino = vertices[actual].vecinos;
 
             while (vecino != nullptr)

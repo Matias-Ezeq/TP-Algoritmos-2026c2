@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include "modelos.h"
 #include "estructuras.h"
 
 using namespace std;
