@@ -117,7 +117,7 @@ class ListaDobleEnlazada
 
    ~ListaDobleEnlazada()
         {
-            NodoListaEnlazada<T>* actual = this->primero;
+            NodoListaDobleEnlazada<T>* actual = this->primero;
 
             while (actual != nullptr)
             {
