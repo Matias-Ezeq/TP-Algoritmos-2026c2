@@ -4,10 +4,8 @@
 #include <bits/stdc++.h>
 
 #include "modelos.h"
-<<<<<<< HEAD
 #include "estructuras.h"
-=======
->>>>>>> 71338bb (menu completo de los cuatro puntos (A, B, C y D))
+
 
 using namespace std;
 
