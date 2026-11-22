@@ -78,7 +78,7 @@ class ColaDePrioridad
         {
             Nodo * aux = new Nodo(bicicleta);
 
-            if (primero = nullptr)
+            if (primero == nullptr)
             {
                 primero = aux;
                 ultimo = aux;

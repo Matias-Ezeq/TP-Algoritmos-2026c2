@@ -4,66 +4,54 @@
 #include <bits/stdc++.h>
 
 #include "modelos.h"
+#include "estructuras.h"
 
 using namespace std;
 
 
 
 //Lista Ordenada doblemente enlazada para permitir busquedas e inserciones ordenadas desde cualquier extremo. Complejidad O(N) de busqueda y O(log N) de inserción ya que elige el extremo con menor diferencia respecto a la fecha del viaje a insertar.
-class ListaDeViajes
-{
-    struct Nodo {
-        Viaje viaje;
-        Nodo * siguiente = nullptr;
-        Nodo * anterior = nullptr;
-        explicit Nodo(const Viaje& v) : viaje(v) {}
-    };
-    
-    Nodo * primero = nullptr;
-    Nodo * ultimo = nullptr;
 
+
+class ListaDeViajes: public ListaDobleEnlazada<Viaje>
+{
     public:
-    bool vacia() const { return primero == nullptr;};
-    const Nodo * getPrimero() const { return primero;};
-    const Nodo * getUltimo() const { return ultimo;};
-        
-    
-    void push(const Viaje& viaje)
+    void push(Viaje * viaje)
     {
-        Nodo* aux = new Nodo(viaje);
+        NodoListaDobleEnlazada<Viaje> * aux = new NodoListaDobleEnlazada(viaje);
         if(vacia())
         {
             aux -> anterior = nullptr;
             aux -> siguiente = nullptr;
-            primero = aux;
-            ultimo = aux;
+            this->primero = aux;
+            this-> ultimo = aux;
         }
         else
         {
-            int fechaPrimero = primero -> viaje.fecha;
-            int fechaUltimo = ultimo -> viaje.fecha;
-            if (viaje.fecha <= fechaPrimero)
+            int fechaPrimero = primero -> dato -> fecha;
+            int fechaUltimo = ultimo -> dato -> fecha;
+            if (viaje->fecha <= fechaPrimero)
             {
-                aux -> siguiente = primero;
-                primero -> anterior = aux;
-                primero = aux;
+                aux -> siguiente = this -> primero;
+                this -> primero -> anterior = aux;
+                this -> primero = aux;
             }
-            else if (viaje.fecha >= fechaUltimo)
+            else if (viaje->fecha >= fechaUltimo)
             {
-                aux -> anterior = ultimo;
-                ultimo -> siguiente = aux;
-                ultimo = aux;
+                aux -> anterior = this -> ultimo;
+                this -> ultimo -> siguiente = aux;
+                this -> ultimo = aux;
             }
             //si la fecha es posterior a la del primero y anterior al del ultimo, compara para ver desde que lado iterar para asegurar orden por fecha.
             else {
-                int difPrimero = viaje.fecha - fechaPrimero;
-                int difUltimo = fechaUltimo - viaje.fecha;
-                Nodo * nodoActual;
+                int difPrimero = viaje->fecha - fechaPrimero;
+                int difUltimo = fechaUltimo - viaje->fecha;
+                NodoListaDobleEnlazada<Viaje> * nodoActual = nullptr;
 
                 if(difPrimero <= difUltimo)
                 {
-                    nodoActual = primero -> siguiente;
-                    while(nodoActual -> viaje.fecha <= viaje.fecha)
+                    nodoActual = this -> primero -> siguiente;
+                    while(nodoActual -> dato->fecha <= viaje->fecha)
                     {
                         nodoActual = nodoActual -> siguiente;
                     }
@@ -72,8 +60,8 @@ class ListaDeViajes
                 }
                 else
                 {
-                    nodoActual = ultimo -> anterior;
-                    while(nodoActual -> viaje.fecha >= viaje.fecha)
+                    nodoActual = this -> ultimo -> anterior;
+                    while(nodoActual -> dato->fecha >= viaje->fecha)
                     {
                         nodoActual = nodoActual->anterior;
                     }
@@ -87,11 +75,17 @@ class ListaDeViajes
     }
 
    ~ListaDeViajes() {
-    for (Nodo* n = primero; n; ) { Nodo* sig = n->siguiente; delete n; n = sig; }
+    for (NodoListaDobleEnlazada<Viaje>* n = primero; n; )
+    {
+        NodoListaDobleEnlazada<Viaje>* sig = n->siguiente; 
+        delete n->dato;
+        delete n; 
+        n = sig;
+    }
 } 
 };
 
-int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha2, string estacion){
+int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha2){
     const auto* primero = lista->getPrimero();
     const auto* ultimo = lista->getUltimo();
     int cantidadDeViajes=0;
@@ -100,15 +94,15 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
 
     if (!lista->vacia())
     {
-        int diferenciaInicio = fecha1 - primero->viaje.fecha;
-        int diferenciaFinal = ultimo->viaje.fecha - fecha2;
+        int diferenciaInicio = fecha1 - primero->dato->fecha;
+        int diferenciaFinal = ultimo->dato->fecha - fecha2;
 
         auto* nodoActual = primero;
         if(diferenciaInicio<=diferenciaFinal)
         {
-            while(nodoActual != nullptr && nodoActual->viaje.fecha <= fecha2)
+            while(nodoActual != nullptr && nodoActual->dato->fecha <= fecha2)
             {
-                if(nodoActual->viaje.estacion_origen == estacion && nodoActual->viaje.fecha >= fecha1)
+                if(nodoActual->dato->fecha >= fecha1)
                 {
                     cantidadDeViajes += 1;
                 }
@@ -118,9 +112,9 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
         else
         {
             nodoActual = ultimo;
-            while(nodoActual!= nullptr && nodoActual->viaje.fecha >= fecha1)
+            while(nodoActual!= nullptr && nodoActual->dato->fecha >= fecha1)
             {
-                if(nodoActual->viaje.estacion_origen == estacion && nodoActual->viaje.fecha <= fecha2)
+                if(nodoActual->dato->fecha <= fecha2)
                 {
                     cantidadDeViajes += 1;
                 }
@@ -139,9 +133,9 @@ int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario)
 
     while (nodoActual != nullptr)
     {
-        if (nodoActual->viaje.dni_usuario == dniUsuario)
+        if (nodoActual->dato->dni_usuario == dniUsuario)
         {
-            minutosPedaleados += nodoActual->viaje.duracion_min;
+            minutosPedaleados += nodoActual->dato->duracion_min;
         }
 
         nodoActual = nodoActual->siguiente;
@@ -161,14 +155,14 @@ void llenarConDatos(ListaDeViajes* lista)
 
     while (DatosDeViaje >> viaje_id >> bici_id >> dni_usuario >> estacion_origen >> estacion_destino >> fecha >> duracion_min)
     {
-        Viaje aux;
-        aux.id = viaje_id;
-        aux.bici_id = bici_id;
-        aux.dni_usuario = dni_usuario;
-        aux.estacion_origen = estacion_origen;
-        aux.estacion_destino = estacion_destino;
-        aux.fecha = fecha;
-        aux.duracion_min = duracion_min;
+        Viaje * aux;
+        aux->id = viaje_id;
+        aux->bici_id = bici_id;
+        aux->dni_usuario = dni_usuario;
+        aux->estacion_origen = estacion_origen;
+        aux->estacion_destino = estacion_destino;
+        aux->fecha = fecha;
+        aux->duracion_min = duracion_min;
 
         lista->push(aux);
     }
@@ -225,7 +219,6 @@ class ColaDeUsuarios {
 
         int Pop()
         {
-            // Devuelve -1 si la cola esta vacia; conviene consultar vacia() antes.
             if (primero == nullptr)
             {
                 return -1;
