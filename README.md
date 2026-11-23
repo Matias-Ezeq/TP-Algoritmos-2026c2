@@ -35,6 +35,8 @@ Si las bicicletas se insertan en el árbol en un orden estrictamente secuencial 
 
 Para buscar el último elemento (ID 50), el sistema se verá obligado a recorrer uno por uno todos los nodos anteriores, perdiendo por completo la ventaja de eficiencia que caracteriza a los árboles de búsqueda.
 
+Con los datos de prueba reales (60 bicicletas cargadas en orden creciente por ID) el árbol queda degenerado: su altura es **60**, igual a la cantidad de nodos. Por eso las búsquedas, inserciones y eliminaciones son O(n) en la práctica, y no O(log n) como en un árbol balanceado.
+
 ### Punto B: viajes y colas de espera
 
 #### Lista de viajes

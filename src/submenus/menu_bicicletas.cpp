@@ -1,6 +1,42 @@
 // Este archivo NO se compila por separado: se incluye desde main.cpp.
 #pragma once
 
+string leerTipoValido()
+{
+    string tipo;
+
+    while (true)
+    {
+        cout << "Tipo (Mecanica/Electrica): ";
+        cin >> tipo;
+
+        if (tipo == "Mecanica" || tipo == "Electrica")
+        {
+            return tipo;
+        }
+
+        cout << "Tipo invalido. Ingrese Mecanica o Electrica.\n";
+    }
+}
+
+string leerEstadoValido()
+{
+    string estado;
+
+    while (true)
+    {
+        cout << "Estado (OK/Averiada): ";
+        cin >> estado;
+
+        if (estado == "OK" || estado == "Averiada")
+        {
+            return estado;
+        }
+
+        cout << "Estado invalido. Ingrese OK o Averiada.\n";
+    }
+}
+
 void menuBicicletas(Sistema& sistema)
 {
     int opcion;
@@ -30,20 +66,22 @@ void menuBicicletas(Sistema& sistema)
 
             cout << "Estacion: ";
             cin >> codigoEstacion;
-            cout << "Tipo (Mecanica/Electrica): ";
-            cin >> tipo;
-            cout << "Estado (OK/Averiada): ";
-            cin >> estado;
+            tipo = leerTipoValido();
+            estado = leerEstadoValido();
 
             int kilometros = leerEntero("Kilometros: ");
 
-            sistema.arbol.insertar(
-                biciId,
-                codigoEstacion,
-                tipo,
-                estado,
-                kilometros
-            );
+            if (!sistema.arbol.insertar(
+                    biciId,
+                    codigoEstacion,
+                    tipo,
+                    estado,
+                    kilometros))
+            {
+                cout << "Ya existe una bicicleta con el ID " << biciId
+                     << ".\n";
+                break;
+            }
 
             cout << "Bicicleta insertada.\n";
             break;
@@ -68,9 +106,24 @@ void menuBicicletas(Sistema& sistema)
         case 6:
         {
             int biciId = leerEntero("ID a eliminar: ");
-            cout << "Aviso: es la funcionalidad opcional y puede dejar "
-                 << "memoria sin liberar.\n";
-            sistema.arbol.eliminar(biciId);
+
+            if (sistema.taller.contieneBicicleta(biciId))
+            {
+                cout << "No se puede eliminar: la bicicleta esta en el "
+                     << "taller de reparaciones.\n";
+                break;
+            }
+
+            if (sistema.arbol.eliminar(biciId))
+            {
+                cout << "Bicicleta " << biciId
+                     << " eliminada correctamente.\n";
+            }
+            else
+            {
+                cout << "No existe una bicicleta con ese ID.\n";
+            }
+
             break;
         }
         case 0:
