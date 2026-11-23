@@ -11,7 +11,7 @@ struct NodoListaEnlazada
     T * dato = nullptr;
     NodoListaEnlazada<T> * siguiente = nullptr;
 
-    NodoListaEnlazada(T * nuevoDato)
+    NodoListaEnlazada<T>(T * nuevoDato)
     {
         this->dato = nuevoDato;
     }
@@ -20,6 +20,7 @@ struct NodoListaEnlazada
 template <typename T>
 class ListaEnlazada
 {
+    protected:
     NodoListaEnlazada<T> * primero = nullptr;
     NodoListaEnlazada<T> * ultimo = nullptr;
 
@@ -77,7 +78,7 @@ struct NodoListaDobleEnlazada
     NodoListaDobleEnlazada<T> * siguiente = nullptr;
     NodoListaDobleEnlazada<T> * anterior = nullptr;
 
-    NodoListaDobleEnlazada(T * nuevoDato)
+    NodoListaDobleEnlazada<T>(T * nuevoDato)
     {
         this->dato = nuevoDato;
     }
@@ -86,6 +87,7 @@ struct NodoListaDobleEnlazada
 template <typename T>
 class ListaDobleEnlazada
 {
+    protected:
     NodoListaDobleEnlazada<T> * primero = nullptr;
     NodoListaDobleEnlazada<T> * ultimo = nullptr;
 
@@ -97,19 +99,19 @@ class ListaDobleEnlazada
     
     void push(T * dato)
     {
-        NodoListaDobleEnlazada<T>* aux = new NodoListaDobleEnlazada<T>(dato);
+        NodoListaDobleEnlazada<T>* nuevoNodo = new NodoListaDobleEnlazada<T>(dato);
         if(vacia())
         {
-            aux -> anterior = nullptr;
-            aux -> siguiente = nullptr;
+            nuevoNodo -> anterior = nullptr;
+            nuevoNodo -> siguiente = nullptr;
             this->primero = aux;
             this->ultimo = aux;
         }
         else
         {
-            aux -> anterior = this->ultimo;
-            this->ultimo -> siguiente = aux;
-            this->ultimo = aux;
+            this->ultimo->siguiente = nuevoNodo;
+            nuevoNodo->anterior = this->ultimo;
+            this->ultimo = nuevoNodo;
         }
     }
 
