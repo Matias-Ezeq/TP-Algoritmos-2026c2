@@ -1,8 +1,8 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
-#include <algorithm>
+
 #include "modelos.h"
-#include "estructuras.h"
 
 using namespace std;
 
@@ -13,6 +13,10 @@ struct NodoBici {
 
     NodoBici(int id, string est, string t, string e, int km)
         : bici(new Bicicleta(id,est,t,e,km)), hijoIzquierda(nullptr), hijoDerecha(nullptr) {}
+
+    ~NodoBici() {
+        delete bici;
+    }
 };
 
 class ArbolBicicletas {
@@ -100,17 +104,28 @@ private:
                 delete actual;
                 return temp;
             }
-            NodoBici* temp = obtenerMinimo(actual->hijoDerecha);
-            actual = new (actual) NodoBici(temp->bici->getBiciId(), temp->bici->getCodigoEstacion(), 
-                                           temp->bici->getTipo(), temp->bici->getEstado(), 
-                                           temp->bici->getKilometros());
-            actual->hijoDerecha = eliminarRecursivo(actual->hijoDerecha, temp->bici->getBiciId());
+            // Se intercambia la bicicleta con el sucesor (minimo del
+            // subarbol derecho) y se elimina el nodo sucesor. Asi se
+            // conservan los dos subarboles y no se pierde memoria.
+            NodoBici* sucesor = obtenerMinimo(actual->hijoDerecha);
+            Bicicleta* biciEliminada = actual->bici;
+            int idEliminado = biciEliminada->getBiciId();
+
+            actual->bici = sucesor->bici;
+            sucesor->bici = biciEliminada;
+            actual->hijoDerecha = eliminarRecursivo(
+                actual->hijoDerecha,
+                idEliminado
+            );
         }
         return actual;
     }
 
 public:
     ArbolBicicletas() : raiz(nullptr) {}
+
+    ArbolBicicletas(const ArbolBicicletas&) = delete;
+    ArbolBicicletas& operator=(const ArbolBicicletas&) = delete;
 
     ~ArbolBicicletas() {
         liberarPostorden(raiz);
@@ -121,8 +136,13 @@ public:
         return raiz;
     }
 
-    void insertar(int id, string est, string t, string e, int km) {
+    bool insertar(int id, string est, string t, string e, int km) {
+        if (buscarRecursivo(raiz, id) != nullptr) {
+            return false;
+        }
+
         raiz = insertarRecursivo(raiz, id, est, t, e, km);
+        return true;
     }
 
     bool buscarPorId(int id) const {
@@ -134,6 +154,18 @@ public:
         }
         cout << "Bicicleta con id " << id << " no encontrada en el sistema." << endl;
         return false;
+    }
+
+    Bicicleta* obtenerPorId(int id) const
+    {
+        NodoBici* buscado = buscarRecursivo(raiz, id);
+
+        if (buscado == nullptr)
+        {
+            return nullptr;
+        }
+
+        return buscado->bici;
     }
 
     void listarInorden() const {
@@ -149,7 +181,12 @@ public:
         return calcularAlturaRecursivo(raiz);
     }
 
-    void eliminar(int id) {
+    bool eliminar(int id) {
+        if (buscarRecursivo(raiz, id) == nullptr) {
+            return false;
+        }
+
         raiz = eliminarRecursivo(raiz, id);
+        return true;
     }
 };

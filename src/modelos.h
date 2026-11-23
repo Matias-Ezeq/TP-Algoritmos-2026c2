@@ -84,12 +84,12 @@ public:
 struct Viaje
 {
     int id;
-    int bici_id;
-    int dni_usuario;
-    string estacion_origen;
-    string estacion_destino;
+    int biciId;
+    int dniUsuario;
+    string estacionOrigen;
+    string estacionDestino;
     int fecha;
-    int duracion_min;
+    int duracionMin;
 };
 
 #endif

@@ -34,7 +34,7 @@ void menuViajes(Sistema& sistema)
              << "2. Viajes de un usuario y total de minutos\n"
              << "3. Bicicletas con mas de X kilometros\n"
              << "4. Cola de espera de una estacion\n"
-             << "5. Taller de reparaciones (cola de prioridad) - PUNTO SIN FINALIZAR\n"
+             << "5. Taller de reparaciones (cola de prioridad)\n"
              << "0. Volver\n";
 
         opcion = leerEntero("Seleccionar una opcion: ");
@@ -72,14 +72,14 @@ void menuViajes(Sistema& sistema)
 
             while (nodo != nullptr)
             {
-                if (nodo->viaje.dni_usuario == dni)
+                if (nodo->viaje.dniUsuario == dni)
                 {
                     cout << "  Viaje " << nodo->viaje.id
-                         << " | bici " << nodo->viaje.bici_id
-                         << " | " << nodo->viaje.estacion_origen
-                         << " -> " << nodo->viaje.estacion_destino
+                         << " | bici " << nodo->viaje.biciId
+                         << " | " << nodo->viaje.estacionOrigen
+                         << " -> " << nodo->viaje.estacionDestino
                          << " | " << nodo->viaje.fecha
-                         << " | " << nodo->viaje.duracion_min << " min\n";
+                         << " | " << nodo->viaje.duracionMin << " min\n";
                     cantidad++;
                 }
 
@@ -93,7 +93,7 @@ void menuViajes(Sistema& sistema)
             else
             {
                 cout << "Total: " << cantidad << " viajes, "
-                     << minutosPedaleadosPorusuario(&sistema.viajes, dni)
+                     << minutosPedaleadosPorUsuario(&sistema.viajes, dni)
                      << " minutos pedaleados.\n";
             }
 
@@ -183,8 +183,46 @@ void menuViajes(Sistema& sistema)
         }
         case 5:
         {
-            cout << "\nPUNTO SIN FINALIZAR: la cola de prioridad del taller no\n"
-                 << "esta integrada al menu.\n";
+            int accion = leerEntero(
+                "1. Insertar bicicleta / 2. Extraer mas urgente: "
+            );
+
+            if (accion == 1)
+            {
+                int biciId = leerEntero("ID de la bicicleta: ");
+                Bicicleta* bicicleta =
+                    sistema.arbol.obtenerPorId(biciId);
+
+                if (bicicleta == nullptr)
+                {
+                    cout << "No existe una bicicleta con ese ID.\n";
+                    break;
+                }
+
+                sistema.taller.insertar(bicicleta);
+                cout << "Bicicleta " << biciId
+                     << " insertada en el taller.\n";
+            }
+            else if (accion == 2)
+            {
+                Bicicleta* bicicleta =
+                    sistema.taller.extraerMasUrgente();
+
+                if (bicicleta == nullptr)
+                {
+                    cout << "El taller no tiene bicicletas en espera.\n";
+                }
+                else
+                {
+                    cout << "Se extrajo la bicicleta mas urgente:\n";
+                    bicicleta->mostrarDatos();
+                }
+            }
+            else
+            {
+                cout << "Opcion invalida.\n";
+            }
+
             break;
         }
         case 0:

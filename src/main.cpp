@@ -9,12 +9,8 @@
 #include "estaciones.cpp"
 #include "ciclovias.cpp"
 #include "ejercicio_arbol.c++"
-
-// viajes.cpp tiene su propio main: se renombra para poder reutilizar sus
-// clases y funciones dentro de este menu.
-#define main mainDeViajes
+#include "cola_de_prioridad.cpp"
 #include "viajes.cpp"
-#undef main
 
 using namespace std;
 
@@ -106,7 +102,7 @@ public:
 
     void encolar(const string& codigo, int dni)
     {
-        obtenerNodo(codigo)->cola->Push(dni);
+        obtenerNodo(codigo)->cola->push(dni);
     }
 
     bool hayEspera(const string& codigo) const
@@ -124,7 +120,7 @@ public:
             return -1;
         }
 
-        return nodo->cola->Pop();
+        return nodo->cola->pop();
     }
 };
 
@@ -135,6 +131,7 @@ struct Sistema
     ArbolBicicletas arbol;
     ListaDeViajes viajes;
     ColaEsperaEstaciones esperas;
+    ColaDePrioridad taller;
 };
 
 int leerEntero(const string& mensaje)
@@ -237,7 +234,10 @@ int main()
         return 1;
     }
 
-    llenarConDatos(&sistema.viajes);
+    if (!llenarConDatos(&sistema.viajes))
+    {
+        cout << "No se pudo cargar el archivo de viajes.\n";
+    }
 
     int opcion;
 

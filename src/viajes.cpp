@@ -1,8 +1,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <bits/stdc++.h>
-
 #include "modelos.h"
 #include "estructuras.h"
 
@@ -17,15 +15,30 @@ using namespace std;
 class ListaDeViajes: public ListaDobleEnlazada<Viaje>
 {
     public:
-    void push(Viaje * viaje)
+    bool vacia() const { return primero == nullptr;};
+    const Nodo * getPrimero() const { return primero;};
+    const Nodo * getUltimo() const { return ultimo;};    
+    
+    void push(const Viaje& viaje)
     {
-        NodoListaDobleEnlazada<Viaje> * aux = new NodoListaDobleEnlazada(viaje);
-        if(vacia())
+        Nodo* aux = new Nodo(viaje);
+
+        if (vacia())
         {
-            aux -> anterior = nullptr;
-            aux -> siguiente = nullptr;
-            this->primero = aux;
-            this-> ultimo = aux;
+            primero = aux;
+            ultimo = aux;
+        }
+        else if (viaje.fecha <= primero->dato->fecha)
+        {
+            aux->siguiente = primero;
+            primero->anterior = aux;
+            primero = aux;
+        }
+        else if (viaje.fecha >= ultimo->dato->fecha)
+        {
+            aux->anterior = ultimo;
+            ultimo->siguiente = aux;
+            ultimo = aux;
         }
         else
         {
@@ -72,6 +85,11 @@ class ListaDeViajes: public ListaDobleEnlazada<Viaje>
                 nodoActual -> siguiente = aux;
                 aux -> siguiente -> anterior = aux;
             }
+
+            aux->anterior = nodoActual->anterior;
+            aux->siguiente = nodoActual;
+            nodoActual->anterior->siguiente = aux;
+            nodoActual->anterior = aux;
         }
     }
 
@@ -91,9 +109,7 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
     const auto* ultimo = lista->getUltimo();
     int cantidadDeViajes=0;
 
-    if (fecha1 > fecha2) swap(fecha1,fecha2);
-
-    if (!lista->vacia())
+    if (fecha1 > fecha2)
     {
         int diferenciaInicio = fecha1 - primero->dato->fecha;
         int diferenciaFinal = ultimo->dato->fecha - fecha2;
@@ -122,12 +138,14 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
                 nodoActual = nodoActual->anterior;
             }
         }
+
+        nodoActual = nodoActual->siguiente;
     }
 
     return cantidadDeViajes;
 }
 
-int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario)
+int minutosPedaleadosPorUsuario(ListaDeViajes* lista, int dniUsuario)
 {
     int minutosPedaleados = 0;
     auto* nodoActual = lista->getPrimero();
@@ -142,19 +160,23 @@ int minutosPedaleadosPorusuario(ListaDeViajes* lista, int dniUsuario)
         nodoActual = nodoActual->siguiente;
     }
 
-
     return minutosPedaleados;
 }
 
 
-void llenarConDatos(ListaDeViajes* lista)
+bool llenarConDatos(ListaDeViajes* lista)
 {
-    string linea = "", estacion_origen = "", estacion_destino = "";
-    int viaje_id = 0, bici_id = 0, dni_usuario = 0, fecha = 0, duracion_min = 0;
-    fstream DatosDeViaje;
-    DatosDeViaje.open("./src/datos de entrada/viajes.txt");
+    string estacionOrigen = "", estacionDestino = "";
+    int viajeId = 0, biciId = 0, dniUsuario = 0, fecha = 0, duracionMin = 0;
+    fstream datosDeViaje;
+    datosDeViaje.open("./src/datos de entrada/viajes.txt");
 
-    while (DatosDeViaje >> viaje_id >> bici_id >> dni_usuario >> estacion_origen >> estacion_destino >> fecha >> duracion_min)
+    if (!datosDeViaje.is_open())
+    {
+        return false;
+    }
+
+    while (datosDeViaje >> viajeId >> biciId >> dniUsuario >> estacionOrigen >> estacionDestino >> fecha >> duracionMin)
     {
         Viaje * aux;
         aux->id = viaje_id;
@@ -168,8 +190,9 @@ void llenarConDatos(ListaDeViajes* lista)
         lista->push(aux);
     }
 
-    DatosDeViaje.close();
-};
+    datosDeViaje.close();
+    return true;
+}
 
 class ColaDeUsuarios {
     private:
@@ -200,7 +223,7 @@ class ColaDeUsuarios {
             return primero == nullptr;
         }
 
-        void Push(int dni)
+        void push(int dni)
         {
             Nodo* aux = new Nodo;
             aux -> dni = dni;
@@ -218,7 +241,7 @@ class ColaDeUsuarios {
             }
         }
 
-        int Pop()
+        int pop()
         {
             if (primero == nullptr)
             {
@@ -239,12 +262,3 @@ class ColaDeUsuarios {
             return dni;
         }
 };
-
-
-int main()
-{
-    ListaDeViajes lista;
-    llenarConDatos(&lista);
-
-    return 0;
-}
