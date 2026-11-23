@@ -1,8 +1,12 @@
 # TP Algoritmos 2026c2
 
+Compilar desde el directorio raiz con el siguiente comando:
+
+`g++ -std=c++17 -Wall --Wextra ./src/main.cpp -o ./out/main` 
+
 Ejecutar desde el directorio raiz con el siguiente comando:
 
-./out/(nombreDelPrograma)
+`./out/main`
 
 ### Tabla hash de estaciones
 
