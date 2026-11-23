@@ -50,3 +50,19 @@ Con los datos de prueba reales (60 bicicletas cargadas en orden creciente por ID
 #### Cola de prioridad
 
 * implementada con una lista doblemente enlazada, con complejidad O(n) para encolar y O(1) para extraer. En caso de encolar un elemento con mayor prioridad que el primero o menor/igual prioridad que el último, se inserta en O(1).
+
+# Sección D: Redistribución con backtracking
+
+Un camión con capacidad para exactamente **C** bicicletas debe descargarlas todas en estaciones que les faltan. El programa muestra **todos los subconjuntos de estaciones** cuyos faltantes suman exactamente C, o informa si no hay ninguno.
+
+## Cómo funciona
+
+Para cada estación se decide si **incluirla** o **excluirla**:
+
+1. Si la suma llega exactamente a C, se muestra el subconjunto.
+2. Si la suma supera C o no quedan estaciones, se retrocede.
+3. Si no, se prueba incluyendo la estación, se deshace (retroceso) y se prueba excluyéndola.
+
+## Complejidad temporal en el peor caso
+
+**O(n · 2ⁿ)**, donde n es la cantidad de estaciones. Cada estación se incluye o se excluye, lo que genera hasta 2ⁿ combinaciones, y mostrar cada solución cuesta O(n). La poda (suma mayor a C) ayuda en la práctica pero no mejora el peor caso.
