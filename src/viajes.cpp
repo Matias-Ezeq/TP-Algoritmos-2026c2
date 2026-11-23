@@ -104,7 +104,7 @@ class ListaDeViajes: public ListaDobleEnlazada<Viaje>
 } 
 };
 
-int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha2){
+int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha2,string estacion){
     const auto* primero = lista->getPrimero();
     const auto* ultimo = lista->getUltimo();
     int cantidadDeViajes=0;
@@ -119,7 +119,7 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
         {
             while(nodoActual != nullptr && nodoActual->dato->fecha <= fecha2)
             {
-                if(nodoActual->dato->fecha >= fecha1)
+                if(nodoActual ->dato->estacion_origen == estacion && nodoActual->dato->fecha >= fecha1)
                 {
                     cantidadDeViajes += 1;
                 }
@@ -131,7 +131,7 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
             nodoActual = ultimo;
             while(nodoActual!= nullptr && nodoActual->dato->fecha >= fecha1)
             {
-                if(nodoActual->dato->fecha <= fecha2)
+                if(nodoActual ->dato->estacion_origen == estacion && nodoActual->dato->fecha <= fecha2)
                 {
                     cantidadDeViajes += 1;
                 }
