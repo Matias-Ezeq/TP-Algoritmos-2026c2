@@ -11,7 +11,7 @@ struct NodoListaEnlazada
     T * dato = nullptr;
     NodoListaEnlazada<T> * siguiente = nullptr;
 
-    NodoListaEnlazada<T>(T * nuevoDato)
+    NodoListaEnlazada(T * nuevoDato)
     {
         this->dato = nuevoDato;
     }
@@ -62,10 +62,20 @@ class ListaEnlazada
 
         T * pop()
         {
+            if (this->primero == nullptr)
+            {
+                return nullptr;
+            }
+
             T * dato = this->primero->dato;
             NodoListaEnlazada<T> * aux = this->primero->siguiente;
             delete this->primero;
             this->primero = aux;
+
+            if (this->primero == nullptr)
+            {
+                this->ultimo = nullptr;
+            }
 
             return dato;
         }
@@ -79,7 +89,7 @@ struct NodoListaDobleEnlazada
     NodoListaDobleEnlazada<T> * siguiente = nullptr;
     NodoListaDobleEnlazada<T> * anterior = nullptr;
 
-    NodoListaDobleEnlazada<T>(T * nuevoDato)
+    NodoListaDobleEnlazada(T * nuevoDato)
     {
         this->dato = nuevoDato;
     }
@@ -105,8 +115,8 @@ class ListaDobleEnlazada
         {
             nuevoNodo -> anterior = nullptr;
             nuevoNodo -> siguiente = nullptr;
-            this->primero = aux;
-            this->ultimo = aux;
+            this->primero = nuevoNodo;
+            this->ultimo = nuevoNodo;
         }
         else
         {

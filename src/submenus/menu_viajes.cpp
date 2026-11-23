@@ -72,14 +72,14 @@ void menuViajes(Sistema& sistema)
 
             while (nodo != nullptr)
             {
-                if (nodo->viaje.dniUsuario == dni)
+                if (nodo->dato->dniUsuario == dni)
                 {
-                    cout << "  Viaje " << nodo->viaje.id
-                         << " | bici " << nodo->viaje.biciId
-                         << " | " << nodo->viaje.estacionOrigen
-                         << " -> " << nodo->viaje.estacionDestino
-                         << " | " << nodo->viaje.fecha
-                         << " | " << nodo->viaje.duracionMin << " min\n";
+                    cout << "  Viaje " << nodo->dato->id
+                         << " | bici " << nodo->dato->biciId
+                         << " | " << nodo->dato->estacionOrigen
+                         << " -> " << nodo->dato->estacionDestino
+                         << " | " << nodo->dato->fecha
+                         << " | " << nodo->dato->duracionMin << " min\n";
                     cantidad++;
                 }
 

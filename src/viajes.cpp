@@ -15,128 +15,95 @@ using namespace std;
 class ListaDeViajes: public ListaDobleEnlazada<Viaje>
 {
     public:
-    bool vacia() const { return primero == nullptr;};
-    const Nodo * getPrimero() const { return primero;};
-    const Nodo * getUltimo() const { return ultimo;};    
-    
     void push(const Viaje& viaje)
     {
-        Nodo* aux = new Nodo(viaje);
+        NodoListaDobleEnlazada<Viaje>* nuevoNodo =
+            new NodoListaDobleEnlazada<Viaje>(new Viaje(viaje));
 
-        if (vacia())
+        if (this->vacia())
         {
-            primero = aux;
-            ultimo = aux;
+            this->primero = nuevoNodo;
+            this->ultimo = nuevoNodo;
+            return;
         }
-        else if (viaje.fecha <= primero->dato->fecha)
+
+        if (viaje.fecha <= this->primero->dato->fecha)
         {
-            aux->siguiente = primero;
-            primero->anterior = aux;
-            primero = aux;
+            nuevoNodo->siguiente = this->primero;
+            this->primero->anterior = nuevoNodo;
+            this->primero = nuevoNodo;
+            return;
         }
-        else if (viaje.fecha >= ultimo->dato->fecha)
+
+        if (viaje.fecha >= this->ultimo->dato->fecha)
         {
-            aux->anterior = ultimo;
-            ultimo->siguiente = aux;
-            ultimo = aux;
+            nuevoNodo->anterior = this->ultimo;
+            this->ultimo->siguiente = nuevoNodo;
+            this->ultimo = nuevoNodo;
+            return;
         }
-        else
+
+        int fechaPrimero = this->primero->dato->fecha;
+        int fechaUltimo = this->ultimo->dato->fecha;
+        NodoListaDobleEnlazada<Viaje>* nodoActual = nullptr;
+
+        // Se recorre desde el extremo cuya fecha esta mas cerca de la del
+        // viaje nuevo. nodoActual queda en el primer nodo con fecha mayor.
+        if (viaje.fecha - fechaPrimero <= fechaUltimo - viaje.fecha)
         {
-            int fechaPrimero = primero -> dato -> fecha;
-            int fechaUltimo = ultimo -> dato -> fecha;
-            if (viaje->fecha <= fechaPrimero)
+            nodoActual = this->primero->siguiente;
+
+            while (nodoActual->dato->fecha <= viaje.fecha)
             {
-                aux -> siguiente = this -> primero;
-                this -> primero -> anterior = aux;
-                this -> primero = aux;
-            }
-            else if (viaje->fecha >= fechaUltimo)
-            {
-                aux -> anterior = this -> ultimo;
-                this -> ultimo -> siguiente = aux;
-                this -> ultimo = aux;
-            }
-            //si la fecha es posterior a la del primero y anterior al del ultimo, compara para ver desde que lado iterar para asegurar orden por fecha.
-            else {
-                int difPrimero = viaje->fecha - fechaPrimero;
-                int difUltimo = fechaUltimo - viaje->fecha;
-                NodoListaDobleEnlazada<Viaje> * nodoActual = nullptr;
-
-                if(difPrimero <= difUltimo)
-                {
-                    nodoActual = this -> primero -> siguiente;
-                    while(nodoActual -> dato->fecha <= viaje->fecha)
-                    {
-                        nodoActual = nodoActual -> siguiente;
-                    }
-                    nodoActual = nodoActual -> anterior;
-
-                }
-                else
-                {
-                    nodoActual = this -> ultimo -> anterior;
-                    while(nodoActual -> dato->fecha >= viaje->fecha)
-                    {
-                        nodoActual = nodoActual->anterior;
-                    }
-                }
-                aux -> siguiente = nodoActual -> siguiente;
-                aux -> anterior = nodoActual;
-                nodoActual -> siguiente = aux;
-                aux -> siguiente -> anterior = aux;
-            }
-
-            aux->anterior = nodoActual->anterior;
-            aux->siguiente = nodoActual;
-            nodoActual->anterior->siguiente = aux;
-            nodoActual->anterior = aux;
-        }
-    }
-
-   ~ListaDeViajes() {
-    for (NodoListaDobleEnlazada<Viaje>* n = primero; n; )
-    {
-        NodoListaDobleEnlazada<Viaje>* sig = n->siguiente; 
-        delete n->dato;
-        delete n; 
-        n = sig;
-    }
-} 
-};
-
-int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha2,string estacion){
-    const auto* primero = lista->getPrimero();
-    const auto* ultimo = lista->getUltimo();
-    int cantidadDeViajes=0;
-
-    if (fecha1 > fecha2)
-    {
-        int diferenciaInicio = fecha1 - primero->dato->fecha;
-        int diferenciaFinal = ultimo->dato->fecha - fecha2;
-
-        auto* nodoActual = primero;
-        if(diferenciaInicio<=diferenciaFinal)
-        {
-            while(nodoActual != nullptr && nodoActual->dato->fecha <= fecha2)
-            {
-                if(nodoActual ->dato->estacion_origen == estacion && nodoActual->dato->fecha >= fecha1)
-                {
-                    cantidadDeViajes += 1;
-                }
                 nodoActual = nodoActual->siguiente;
             }
         }
         else
         {
-            nodoActual = ultimo;
-            while(nodoActual!= nullptr && nodoActual->dato->fecha >= fecha1)
+            nodoActual = this->ultimo;
+
+            while (nodoActual->anterior != nullptr
+                   && nodoActual->anterior->dato->fecha > viaje.fecha)
             {
-                if(nodoActual ->dato->estacion_origen == estacion && nodoActual->dato->fecha <= fecha2)
-                {
-                    cantidadDeViajes += 1;
-                }
                 nodoActual = nodoActual->anterior;
             }
+        }
+
+        // Se conserva el orden por fecha; los viajes con la misma fecha
+        // quedan en el orden en que fueron cargados.
+        nuevoNodo->anterior = nodoActual->anterior;
+        nuevoNodo->siguiente = nodoActual;
+        nodoActual->anterior->siguiente = nuevoNodo;
+        nodoActual->anterior = nuevoNodo;
+    }
+};
+
+int cantidadDeViajesEntreFechaYFecha(
+    ListaDeViajes* lista,
+    int fecha1,
+    int fecha2,
+    string estacion
+)
+{
+    if (fecha1 > fecha2)
+    {
+        int auxiliar = fecha1;
+        fecha1 = fecha2;
+        fecha2 = auxiliar;
+    }
+
+    int cantidadDeViajes = 0;
+    const NodoListaDobleEnlazada<Viaje>* nodoActual = lista->getPrimero();
+
+    // La lista esta ordenada por fecha, pero se recorre desde el inicio
+    // porque los viajes con la misma fecha pueden estar intercalados por
+    // estacion de origen.
+    while (nodoActual != nullptr && nodoActual->dato->fecha <= fecha2)
+    {
+        if (nodoActual->dato->fecha >= fecha1
+            && nodoActual->dato->estacionOrigen == estacion)
+        {
+            cantidadDeViajes++;
         }
 
         nodoActual = nodoActual->siguiente;
@@ -148,13 +115,13 @@ int cantidadDeViajesEntreFechaYFecha(ListaDeViajes* lista, int fecha1, int fecha
 int minutosPedaleadosPorUsuario(ListaDeViajes* lista, int dniUsuario)
 {
     int minutosPedaleados = 0;
-    auto* nodoActual = lista->getPrimero();
+    const NodoListaDobleEnlazada<Viaje>* nodoActual = lista->getPrimero();
 
     while (nodoActual != nullptr)
     {
-        if (nodoActual->dato->dni_usuario == dniUsuario)
+        if (nodoActual->dato->dniUsuario == dniUsuario)
         {
-            minutosPedaleados += nodoActual->dato->duracion_min;
+            minutosPedaleados += nodoActual->dato->duracionMin;
         }
 
         nodoActual = nodoActual->siguiente;
@@ -166,28 +133,34 @@ int minutosPedaleadosPorUsuario(ListaDeViajes* lista, int dniUsuario)
 
 bool llenarConDatos(ListaDeViajes* lista)
 {
-    string estacionOrigen = "", estacionDestino = "";
-    int viajeId = 0, biciId = 0, dniUsuario = 0, fecha = 0, duracionMin = 0;
-    fstream datosDeViaje;
-    datosDeViaje.open("./src/datos de entrada/viajes.txt");
+    string estacionOrigen = "";
+    string estacionDestino = "";
+    int viajeId = 0;
+    int biciId = 0;
+    int dniUsuario = 0;
+    int fecha = 0;
+    int duracionMin = 0;
+
+    ifstream datosDeViaje("./src/datos de entrada/viajes.txt");
 
     if (!datosDeViaje.is_open())
     {
         return false;
     }
 
-    while (datosDeViaje >> viajeId >> biciId >> dniUsuario >> estacionOrigen >> estacionDestino >> fecha >> duracionMin)
+    while (datosDeViaje >> viajeId >> biciId >> dniUsuario
+           >> estacionOrigen >> estacionDestino >> fecha >> duracionMin)
     {
-        Viaje * aux;
-        aux->id = viaje_id;
-        aux->bici_id = bici_id;
-        aux->dni_usuario = dni_usuario;
-        aux->estacion_origen = estacion_origen;
-        aux->estacion_destino = estacion_destino;
-        aux->fecha = fecha;
-        aux->duracion_min = duracion_min;
+        Viaje viaje;
+        viaje.id = viajeId;
+        viaje.biciId = biciId;
+        viaje.dniUsuario = dniUsuario;
+        viaje.estacionOrigen = estacionOrigen;
+        viaje.estacionDestino = estacionDestino;
+        viaje.fecha = fecha;
+        viaje.duracionMin = duracionMin;
 
-        lista->push(aux);
+        lista->push(viaje);
     }
 
     datosDeViaje.close();

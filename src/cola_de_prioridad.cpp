@@ -6,118 +6,91 @@ using namespace std;
 
 class ColaDePrioridad
 {
-private:
-    Bicicleta** heap;
-    int cantidad;
-    int capacidad;
-
-    int obtenerPrioridad(const Bicicleta* bicicleta) const
+    enum prioridad
     {
-        if (bicicleta->getTipo() == "Electrica")
-        {
-            return 1;
-        }
+        nula, alta, media, baja
+    };
 
-        if (bicicleta->getEstado() == "Averiada")
-        {
-            return 2;
-        }
-
-        return 3;
-    }
-
-    void subir(int indice)
+    struct Nodo
     {
-        while (indice > 0)
+        Bicicleta* bici;
+        int prioridad = nula;
+        Nodo* siguiente = nullptr;
+        Nodo* anterior = nullptr;
+
+        Nodo(Bicicleta* nuevaBici) : bici(nuevaBici)
         {
-            int padre = (indice - 1) / 2;
-
-            if (obtenerPrioridad(heap[indice])
-                >= obtenerPrioridad(heap[padre]))
+            if (nuevaBici->getTipo() == "Electrica")
             {
-                break;
+                prioridad = alta;
             }
-
-            Bicicleta* auxiliar = heap[indice];
-            heap[indice] = heap[padre];
-            heap[padre] = auxiliar;
-            indice = padre;
+            else if (nuevaBici->getEstado() == "Averiada")
+            {
+                prioridad = media;
+            }
+            else
+            {
+                prioridad = baja;
+            }
         }
-    }
+    };
 
-    void bajar(int indice)
+    Nodo* primero = nullptr;
+    Nodo* ultimo = nullptr;
+    int cantidad = 0;
+
+    void insertarRecorriendo(Nodo* nuevoNodo)
     {
-        while (true)
+        // Complejidad O(n): se recorre desde el extremo mas cercano.
+        if (nuevoNodo->prioridad < primero->prioridad)
         {
-            int hijoIzquierdo = indice * 2 + 1;
-
-            if (hijoIzquierdo >= cantidad)
-            {
-                break;
-            }
-
-            int hijoDerecho = hijoIzquierdo + 1;
-            int hijoMenor = hijoIzquierdo;
-
-            if (hijoDerecho < cantidad
-                && obtenerPrioridad(heap[hijoDerecho])
-                   < obtenerPrioridad(heap[hijoMenor]))
-            {
-                hijoMenor = hijoDerecho;
-            }
-
-            if (obtenerPrioridad(heap[indice])
-                <= obtenerPrioridad(heap[hijoMenor]))
-            {
-                break;
-            }
-
-            Bicicleta* auxiliar = heap[indice];
-            heap[indice] = heap[hijoMenor];
-            heap[hijoMenor] = auxiliar;
-            indice = hijoMenor;
+            nuevoNodo->siguiente = primero;
+            primero->anterior = nuevoNodo;
+            primero = nuevoNodo;
         }
-    }
-
-    void ampliar()
-    {
-        int nuevaCapacidad;
-
-        if (capacidad == 0)
+        else if (nuevoNodo->prioridad >= ultimo->prioridad)
         {
-            nuevaCapacidad = 4;
+            nuevoNodo->anterior = ultimo;
+            ultimo->siguiente = nuevoNodo;
+            ultimo = nuevoNodo;
         }
         else
         {
-            nuevaCapacidad = capacidad * 2;
+            Nodo* nodoActual = primero;
+
+            while (nodoActual != nullptr
+                   && nodoActual->prioridad <= nuevoNodo->prioridad)
+            {
+                nodoActual = nodoActual->siguiente;
+            }
+
+            nuevoNodo->siguiente = nodoActual;
+            nuevoNodo->anterior = nodoActual->anterior;
+
+            nodoActual->anterior->siguiente = nuevoNodo;
+            nodoActual->anterior = nuevoNodo;
         }
-
-        Bicicleta** nuevoHeap = new Bicicleta*[nuevaCapacidad];
-
-        for (int i = 0; i < cantidad; i++)
-        {
-            nuevoHeap[i] = heap[i];
-        }
-
-        delete[] heap;
-        heap = nuevoHeap;
-        capacidad = nuevaCapacidad;
     }
 
 public:
-    ColaDePrioridad()
-        : heap(nullptr), cantidad(0), capacidad(0)
-    {
-    }
-
     ~ColaDePrioridad()
     {
-        delete[] heap;
+        while (primero != nullptr)
+        {
+            Nodo* aux = primero;
+            primero = aux->siguiente;
+
+            // La cola no es duena de las bicicletas: pertenecen al arbol.
+            delete aux;
+        }
+
+        ultimo = nullptr;
+        cantidad = 0;
     }
 
     bool estaVacia() const
     {
-        return cantidad == 0;
+        return primero == nullptr;
     }
 
     int obtenerCantidad() const
@@ -127,12 +100,16 @@ public:
 
     bool contieneBicicleta(int biciId) const
     {
-        for (int i = 0; i < cantidad; i++)
+        const Nodo* nodoActual = primero;
+
+        while (nodoActual != nullptr)
         {
-            if (heap[i]->getBiciId() == biciId)
+            if (nodoActual->bici->getBiciId() == biciId)
             {
                 return true;
             }
+
+            nodoActual = nodoActual->siguiente;
         }
 
         return false;
@@ -140,28 +117,47 @@ public:
 
     void insertar(Bicicleta* bicicleta)
     {
-        if (cantidad == capacidad)
+        Nodo* aux = new Nodo(bicicleta);
+
+        if (primero == nullptr)
         {
-            ampliar();
+            primero = aux;
+            ultimo = aux;
+        }
+        else
+        {
+            insertarRecorriendo(aux);
         }
 
-        heap[cantidad] = bicicleta;
-        subir(cantidad);
         cantidad++;
     }
 
     Bicicleta* extraerMasUrgente()
     {
-        if (estaVacia())
+        if (primero == nullptr)
         {
             return nullptr;
         }
 
-        Bicicleta* masUrgente = heap[0];
-        cantidad--;
-        heap[0] = heap[cantidad];
-        bajar(0);
+        Bicicleta* bicicleta = primero->bici;
+        Nodo* aux = primero;
 
-        return masUrgente;
+        primero = aux->siguiente;
+
+        if (primero != nullptr)
+        {
+            primero->anterior = nullptr;
+        }
+        else
+        {
+            ultimo = nullptr;
+        }
+
+        aux->siguiente = nullptr;
+        aux->anterior = nullptr;
+        delete aux;
+        cantidad--;
+
+        return bicicleta;
     }
 };

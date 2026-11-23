@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <limits>
 
 #include "modelos.h"
 
 #include "estructuras.h"
-#include "modelos.h"
 #include "estaciones.cpp"
 #include "ciclovias.cpp"
 #include "ejercicio_arbol.c++"
@@ -148,8 +148,13 @@ int leerEntero(const string& mensaje)
             return valor;
         }
 
+        if (cin.eof())
+        {
+            return 0;
+        }
+
         cin.clear();
-        cin.ignore(10000, '\n');
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Ingrese un numero valido.\n";
     }
 }

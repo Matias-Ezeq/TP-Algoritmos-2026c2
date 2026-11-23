@@ -9,9 +9,11 @@ void recorrerArbolRecursivo(NodoBici * nodoActual, ListaEnlazada<Bicicleta> * bi
     if (nodoActual != nullptr)
     {
         Bicicleta* bicicleta = nodoActual->bici;
-        if (bicicleta->getKilometros() >= kilometraje)
+        if (bicicleta->getKilometros() > kilometraje)
         {
-            bicicletas->push(bicicleta);
+            // La lista es propietaria de sus datos: se guarda una copia para
+            // no liberar las bicicletas que pertenecen al arbol.
+            bicicletas->push(new Bicicleta(*bicicleta));
         }
         recorrerArbolRecursivo(nodoActual->hijoIzquierda,bicicletas,kilometraje);
         recorrerArbolRecursivo(nodoActual->hijoDerecha,bicicletas,kilometraje);
@@ -20,7 +22,7 @@ void recorrerArbolRecursivo(NodoBici * nodoActual, ListaEnlazada<Bicicleta> * bi
 
 ListaEnlazada<Bicicleta> * bicicletasAReparar(ArbolBicicletas * arbol, int kilometraje)
 {
-    ListaEnlazada<Bicicleta> * bicicletas;
+    ListaEnlazada<Bicicleta> * bicicletas = new ListaEnlazada<Bicicleta>();
 
     recorrerArbolRecursivo(arbol->obtenerRaiz(),bicicletas,kilometraje);
 
