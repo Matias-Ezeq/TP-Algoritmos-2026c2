@@ -36,6 +36,7 @@ class ListaEnlazada
             while (actual != nullptr)
             {
                 NodoListaEnlazada<T>* siguiente = actual->siguiente;
+                delete actual -> dato;
                 delete actual;
                 actual = siguiente;
             }
