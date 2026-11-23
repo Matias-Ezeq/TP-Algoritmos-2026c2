@@ -134,23 +134,3 @@ void probarConDatosPropios() {
 
     delete[] lista;
 }
-
-int main() {
-    int opcion = -1;
-    while (opcion != 0) {
-        cout << "\n=== Redistribucion de bicicletas ===\n"
-             << "1. Ver el ejemplo del enunciado\n"
-             << "2. Cargar mis propios datos\n"
-             << "0. Salir\n";
-        opcion = leerEntero("Elegi una opcion: ", 0);
-
-        if (opcion == 1) {
-            probarEjemploEnunciado();
-        } else if (opcion == 2) {
-            probarConDatosPropios();
-        } else if (opcion != 0) {
-            cout << "Esa opcion no existe, proba de nuevo.\n";
-        }
-    
-    return 0;
-}

@@ -11,6 +11,7 @@
 #include "ejercicio_arbol.c++"
 #include "cola_de_prioridad.cpp"
 #include "viajes.cpp"
+#include "redistribucion.cpp"
 
 using namespace std;
 
@@ -247,7 +248,7 @@ int main()
              << "1. Gestion de estaciones (A)\n"
              << "2. Viajes y colas de espera (B)\n"
              << "3. Bicicletas - ABB (C)\n"
-             << "4. Redistribucion - backtracking (D) - PUNTO SIN FINALIZAR\n"
+             << "4. Redistribucion - backtracking (D)\n"
              << "0. Salir\n";
 
         opcion = leerEntero("Seleccionar una opcion: ");
@@ -264,7 +265,7 @@ int main()
             menuBicicletas(sistema);
             break;
         case 4:
-            menuRedistribucion();
+            menuRedistribucion(sistema);
             break;
         case 0:
             cout << "Programa finalizado.\n";
